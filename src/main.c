@@ -74,7 +74,7 @@ static void Arena_rollback(Arena* arena, Arena_Snapshot snapshot)
   arena->fill_ptr = snapshot;
 }
 
-Arena source_code_arena;
+Arena arena_all;
 
 static String_Slice  load_file(const char* path)
 {
@@ -109,13 +109,13 @@ static unsigned int compile_shader(unsigned int type, String_Slice source)
   {
     int length;
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-    Arena_Snapshot snapshot = Arena_snapshot(&source_code_arena);
-    char* message = Arena_alloc(&source_code_arena, length * sizeof(char));
+    Arena_Snapshot snapshot = Arena_snapshot(&arena_all);
+    char* message = Arena_alloc(&arena_all, length * sizeof(char));
     glGetShaderInfoLog(id, length,  &length, message);
     printf("Failed to compile %s shader. Error message:\n%s\n",
         (type == GL_VERTEX_SHADER ? "vertex" : "fragment"),
         message);
-    Arena_rollback(&source_code_arena, snapshot);
+    Arena_rollback(&arena_all, snapshot);
     glDeleteShader(id);
     return 0;
   }
@@ -159,7 +159,7 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     printf("Running on %s\n", glGetString(GL_VERSION));
-    Arena_init(&source_code_arena, 1 MB);
+    Arena_init(&arena_all, 1 MB);
 
     unsigned int program = 0;
     {
@@ -175,7 +175,7 @@ int main(void)
       munmap(fragment_shader_source.data, fragment_shader_source.length);
     }
     glUseProgram(program);
-    Arena_clear(&source_code_arena);
+    Arena_clear(&arena_all);
 
     unsigned int vao;
     glGenVertexArrays(1, &vao);
