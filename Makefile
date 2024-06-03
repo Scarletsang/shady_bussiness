@@ -1,13 +1,13 @@
 NAME:=openglfun
 CC:=clang
 CFLAGS:= -pedantic -Wall -Wextra -Werror -g
-LDFLAGS= -pedantic -g -lglfw -lglew
+LDFLAGS= -pedantic -g -lglfw
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Darwin)
-CFLAGS += -I$(shell brew --prefix glfw)/include -I$(shell brew --prefix glew)/include
+CFLAGS += -I$(shell brew --prefix glfw)/include
 
-LDFLAGS += -L$(shell brew --prefix glfw)/lib -L$(shell brew --prefix glew)/lib  -framework Cocoa -framework OpenGL -framework IOKit
+LDFLAGS += -L$(shell brew --prefix glfw)/lib -framework Cocoa -framework OpenGL -framework IOKit
 endif
 
 ifdef	FSANITIZE
